@@ -9,7 +9,7 @@ describe('local network: staked frax Ether rate provider', function() {
     let stakedFraxEther: Contract;
     let stakedFraxEtherRateProvider: Contract;
 
-    before('setup eoas', async () => {
+    before('setup', async () => {
         console.log('Starting test from block:', await ethers.provider.getBlockNumber())
     })
 

@@ -5,7 +5,7 @@ import { Contract } from 'ethers';
 describe('mainnet fork staked frax Ether rate provider', function() {
     let stakedFraxEtherRateProvider: Contract;
 
-    before('setup eoas', async () => {
+    before('setup', async () => {
         console.log('Starting test from block:', await ethers.provider.getBlockNumber())
     })
 
