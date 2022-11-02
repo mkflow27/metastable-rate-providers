@@ -10,7 +10,7 @@ import "./interfaces/IRateProvider.sol";
 
 /**
  * @title Generic ERC4626 Rate Provider
- * @notice Returns value of 1 share in terms of the Vault's underlying asset
+ * @dev ensure `getRate` returns scaled to 1e18
  */
 contract ERC4626RateProvider is IRateProvider {
     using Math for uint256;
@@ -18,10 +18,23 @@ contract ERC4626RateProvider is IRateProvider {
     uint256 private immutable _rateScaleFactor;
     IERC4626 public immutable wrappedToken;
 
-    // calling the ERC4626's `decimals` function to ensure
-    // `getRate` only relies on the EIP4626's recommendation of
-    // equalizing vault's and underlying token's decimals
     constructor(IERC4626 _wrappedToken, IERC20Extended _mainToken) {
+        // We do NOT enforce mainToken == wrappedToken.asset() even
+        // though this is the expected behavior in most cases. Instead,
+        // we assume a 1:1 relationship between mainToken and
+        // wrappedToken.asset(), but they do not have to be the same
+        // token. It is vitally important that this 1:1 relationship is
+        // respected, or the pool will not function as intended.
+        //
+        // This allows for use cases where the wrappedToken is
+        // double-wrapped into an ERC-4626 token. For example, consider
+        // a linear pool whose goal is to pair DAI with aDAI. Because
+        // aDAI is a rebasing token, it needs to be wrapped, and let's
+        // say an ERC-4626 wrapper is chosen for compatibility with this
+        // linear pool. Then wrappedToken.asset() will return aDAI,
+        // whereas mainToken is DAI. But the 1:1 relationship holds, and
+        // the pool is still valid.
+        
         uint256 wrappedTokenDecimals = IERC20Extended(address(_wrappedToken)).decimals();
         uint256 mainTokenDecimals = _mainToken.decimals();
         uint256 digitsDifference = Math.add(18, wrappedTokenDecimals).sub(mainTokenDecimals);
@@ -30,10 +43,8 @@ contract ERC4626RateProvider is IRateProvider {
     }
 
     /**
-     * @return returns the amount of assets returned for 1 share deposited
-     * @notice Exchange rate for 1 share deposited
-     * @dev This function takes into account the ERC4626 vault's possibility
-     * of having flexible `decimals`
+     * @return returns exchangeRate scaled to 1e18
+     * @dev scaling to 1e18 must be ensured
      */
     function getRate() external view override returns (uint256) {
         uint256 assetsPerShare = wrappedToken.convertToAssets(1e18);
