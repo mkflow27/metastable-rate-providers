@@ -2,7 +2,7 @@ import { HardhatUserConfig } from 'hardhat/config';
 
 import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-waffle';
-import "@nomiclabs/hardhat-etherscan";
+import '@nomiclabs/hardhat-etherscan';
 //import 'hardhat-local-networks-config-plugin';
 
 const CHAIN_IDS = {
@@ -11,18 +11,25 @@ const CHAIN_IDS = {
 
 const config: HardhatUserConfig = {
   solidity: {
-    version: '0.8.8',
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 9999,
+    compilers: [
+      {
+        version: '0.8.8',
       },
-    },
+      {
+        version: '0.7.4',
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 9999,
+          },
+        },
+      },
+    ],
   },
   etherscan: {
     apiKey: {
-      goerli: 'etherscan key'
-    }
+      goerli: 'api key',
+    },
   },
   networks: {
     hardhat: {
@@ -30,13 +37,13 @@ const config: HardhatUserConfig = {
       forking: {
         url: `archival node`,
         blockNumber: 15868474,
-      }
+      },
     },
     goerli: {
-      url: "goerli node",
-      accounts: ["pk"],
-    }
-  }
+      url: 'goerli node',
+      accounts: ['pk'],
+    },
+  },
 };
 
 export default config;
