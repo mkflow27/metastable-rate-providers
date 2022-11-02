@@ -6,8 +6,8 @@ import "./interfaces/IRateProvider.sol";
 import "./interfaces/IERC4626.sol";
 
 /**
- * @title 
- * @notice 
+ * @title Generic ERC4626 Rate Provider
+ * @notice Returns value of 1 share in terms of the Vault's underlying asset
  */
 contract ERC4626RateProvider is IRateProvider {
     IERC4626 public immutable vault;
@@ -27,7 +27,7 @@ contract ERC4626RateProvider is IRateProvider {
      * @dev This function takes into account the ERC4626 vault's possibility
      * of having flexible `decimals`
      */
-    function getRate() external view override returns(uint256) {
+    function getRate() external view override returns (uint256) {
         return vault.convertToAssets(10**vaultDecimals);
     }
 }
